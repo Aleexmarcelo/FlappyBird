@@ -128,7 +128,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
 		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 	}
-
+//eu sou alex
 	private void verificarEstadoJogo() {
 		boolean toqueTela = Gdx.input.justTouched();
 		if (estadoJogo == 0) {
