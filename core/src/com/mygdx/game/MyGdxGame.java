@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.Random;
 
 public class MyGdxGame extends ApplicationAdapter {
+	//
 	private SpriteBatch batch;
 	private Texture[] passaros;
 	private Texture fundo;
@@ -58,14 +59,17 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	private OrthographicCamera camera;
 	private Viewport viewport;
+	private final float VIRTUAL_WIDTH = 720;
+	private final float VIRTUAL_HEIGHT = 1280;
 
-
+	//
 	@Override
 	public void create() {
 		inicializarTexturas();
 		inicializaObjetos();
 	}
 
+	//
 	@Override
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -76,6 +80,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		detectarColisoes();
 	}
 
+	//
 	private void inicializarTexturas() {
 		passaros = new Texture[3];
 		passaros[0] = new Texture("passaro1.png");
@@ -88,49 +93,59 @@ public class MyGdxGame extends ApplicationAdapter {
 		gameOver = new Texture("game_over.png");
 	}
 
+	//
 	private void inicializaObjetos() {
 		batch = new SpriteBatch();
 		random = new Random();
 
-		float VIRTUAL_WIDTH = 720;
+		//
 		larguraDispositivo = VIRTUAL_WIDTH;
-		float VIRTUAL_HEIGHT = 1280;
 		alturaDispositivo = VIRTUAL_HEIGHT;
 		posicaoInicialVerticalPassaro = alturaDispositivo / 2;
 		posicaoCanoHorizontal = larguraDispositivo;
 		espacoEntreCanos = 350;
 
+		//
 		textoPontucao = new BitmapFont();
 		textoPontucao.setColor(com.badlogic.gdx.graphics.Color.WHITE);
-		textoPontucao.getData().setScale(10);
+		textoPontucao.getData().setScale(4);
 
+		//
 		textoReiniciar = new BitmapFont();
 		textoReiniciar.setColor(com.badlogic.gdx.graphics.Color.GREEN);
 		textoReiniciar.getData().setScale(2);
 
+		//
 		textoMelhorPontuacao = new BitmapFont();
 		textoMelhorPontuacao.setColor(com.badlogic.gdx.graphics.Color.RED);
 		textoMelhorPontuacao.getData().setScale(2);
 
+		//
 		shapeRenderer = new ShapeRenderer();
 		circuloPassaro = new Circle();
 		retanguloCanoBaixo = new Rectangle();
 		retanguloCanoCima = new Rectangle();
 
+		//
 		somVoando = Gdx.audio.newSound(Gdx.files.internal("som_asa.wav"));
 		somColisao = Gdx.audio.newSound(Gdx.files.internal("som_batida.wav"));
 		somPontuacao = Gdx.audio.newSound(Gdx.files.internal("som_pontos.wav"));
 
+		//
 		preferencias = Gdx.app.getPreferences("FlappyBird");
 		pontuacaoMaxima = preferencias.getInteger("pontuacaoMaxima", 0);
 
+		//
 		camera = new OrthographicCamera();
 		camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
 		viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 	}
-	//eu sou alex
+
+	//
 	private void verificarEstadoJogo() {
+		//
 		boolean toqueTela = Gdx.input.justTouched();
+		//
 		if (estadoJogo == 0) {
 			if (toqueTela) {
 				gravidade = -15;
@@ -138,12 +153,14 @@ public class MyGdxGame extends ApplicationAdapter {
 				somVoando.play();
 			}
 
+			//
 		} else if (estadoJogo == 1) {
 			if (toqueTela) {
 				gravidade = -15;
 				somVoando.play();
 			}
-			posicaoCanoVertical -= Gdx.graphics.getDeltaTime() * 200;
+			//
+			posicaoCanoHorizontal -= Gdx.graphics.getDeltaTime() * 200;
 			if (posicaoCanoHorizontal < -canoTopo.getWidth()) {
 				posicaoCanoHorizontal = larguraDispositivo;
 				posicaoCanoVertical = random.nextInt(400) - 200;
@@ -152,6 +169,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			if (posicaoInicialVerticalPassaro > 0 || toqueTela)
 				posicaoInicialVerticalPassaro = posicaoInicialVerticalPassaro - gravidade;
 			gravidade++;
+			//
 		} else if (estadoJogo == 2) {
 			if (pontos > pontuacaoMaxima) {
 				pontuacaoMaxima = pontos;
@@ -159,29 +177,34 @@ public class MyGdxGame extends ApplicationAdapter {
 				preferencias.flush();
 			}
 			posicaoHorizontalPassaro -= Gdx.graphics.getDeltaTime() * 500;
-		}
 
-		if (toqueTela) {
-			estadoJogo = 0;
-			pontos = 0;
-			gravidade = 0;
-			posicaoHorizontalPassaro = 0;
-			posicaoInicialVerticalPassaro = alturaDispositivo / 2;
-			posicaoCanoHorizontal = larguraDispositivo;
+
+			//
+			if (toqueTela) {
+				estadoJogo = 0;
+				pontos = 0;
+				gravidade = 0;
+				posicaoHorizontalPassaro = 0;
+				posicaoInicialVerticalPassaro = alturaDispositivo / 2;
+				posicaoCanoHorizontal = larguraDispositivo;
+			}
 		}
 	}
-
+	//
 	private void detectarColisoes()
 	{
+		//
 		circuloPassaro.set(
 				50 + posicaoHorizontalPassaro + passaros[0].getWidth() / 2,
 				posicaoInicialVerticalPassaro + passaros[0].getHeight() / 2,
 				passaros[0].getWidth() / 2);
 
+		//
 		retanguloCanoBaixo.set(
 				posicaoCanoHorizontal, alturaDispositivo /2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoBaixo.getWidth(), canoBaixo.getHeight());
 
+		//
 		retanguloCanoCima.set(
 				posicaoCanoHorizontal, alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical,
 				canoTopo.getWidth(), canoTopo.getHeight());
@@ -197,6 +220,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 	}
 
+	//
 	private void desenharTexturas()
 	{
 		batch.setProjectionMatrix(camera.combined);
@@ -204,7 +228,9 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.draw(fundo, 0 , 0 , larguraDispositivo, alturaDispositivo);
 		batch.draw(passaros[(int) variacao],
 				50 + posicaoHorizontalPassaro,posicaoInicialVerticalPassaro);
-		batch.draw(canoBaixo, posicaoCanoHorizontal, alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical);
+		batch.draw(canoBaixo,
+				posicaoCanoHorizontal,
+				alturaDispositivo / 2 - canoBaixo.getHeight() - espacoEntreCanos / 2 + posicaoCanoVertical);
 		batch.draw(canoTopo, posicaoCanoHorizontal, alturaDispositivo / 2 + espacoEntreCanos / 2 + posicaoCanoVertical);
 		textoPontucao.draw(batch, String.valueOf(pontos), larguraDispositivo / 2, alturaDispositivo -110);
 
@@ -218,6 +244,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.end();
 	}
 
+	//
 	private void validarPontos()
 	{
 		if(posicaoCanoHorizontal < 50-passaros[0].getWidth())
@@ -235,6 +262,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			variacao = 0;
 	}
 
+	//
 	@Override
 	public void resize(int width, int height)
 	{viewport.update(width,height);}
